@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>簡易掲示板</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+  <link rel="stylesheet" href="./main.css">
+</head>
+
+<style>
+  .main {
+    margin: 0 auto;
+    margin-top: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 30px;
+  }
+</style>
+<script>
+
+  const get_thr_json = () =>{
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+        if (xhr.response) {
+          const jsonObj = JSON.parse(xhr.responseText);
+          disp(jsonObj, "thr_list");
+        }
+      }
+    }
+
+    xhr.open("GET", 'http://localhost:8888/api/thread');
+
+    xhr.send();
+  }
+
+  const disp = (obj, id) => {
+    let text = [];
+    for (let item of obj.threads) {
+      text.push('<a href="' + 'http://localhost:8888/api/thread' + '?id=' + item.id + '" class="btn btn-3d-flip"><span class="btn-3d-flip-box"><span class="btn-3d-flip-box-face btn-3d-flip-box-face--front">' + item.name + '<i class="fas fa-angle-right fa-position-right"></i></span><span class="btn-3d-flip-box-face btn-3d-flip-box-face--back">スレッドを閲覧する<i class="fas fa-angle-right fa-position-right"></i></span></span></a>');
+    }
+    document.getElementById(id).innerHTML = text.join('');
+  }
+
+  window.onload = () => {
+    get_thr_json();
+  }
+
+</script>
+
+<body>
+  <div class="main container">
+
+    <h1>スレッド一覧</h1>
+
+    <div id="thr_list"></div>
+
+  </div>
+</body>
+
+</html>

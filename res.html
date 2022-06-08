@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <title>簡易掲示板</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+  <link rel="stylesheet" href="./main.css">
+</head>
+
+<style>
+  .main {
+    margin: 0 auto;
+    margin-top: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 30px;
+  }
+</style>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+
+  const get_thr_json = () =>{
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+        if (xhr.response) {
+          const jsonObj = JSON.parse(xhr.responseText);
+          console.log(jsonObj);
+          disp(jsonObj, "thr_list");
+        }
+      }
+    }
+
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+    post_id = params.get('id');
+    console.log(post_id);
+
+    xhr.open("GET", "http://localhost:8888/api/thread?id=" + post_id);
+
+    xhr.send();
+  }
+
+  const disp = (obj, id) => {
+    let text = [];
+    for (let item of obj.res) {
+      text.push('<div class="box29"><div class="box-title">匿名さん ' + item.timestamp + '</div><p>' + item.content +'</p></div>');
+    }
+    document.getElementById(id).innerHTML = text.join('');
+  }
+
+  window.onload = () => {
+    get_thr_json();
+  }
+
+  const parseJson = function(data) {
+    let returnJson = {};
+        for (idx = 0; idx < data.length; idx++) {
+            returnJson[data[idx].name] = data[idx].value
+        }
+    return returnJson;
+}
+const push_button = () => { 
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+    post_id = params.get('id')
+    const content = document.getElementById("content");
+    console.log(content);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://localhost:8888/api/res");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.send(JSON.stringify({"content": content.value, "id": post_id}));
+}
+</script>
+
+<body>
+  <div class="main container">
+
+    <h1>レス一覧</h1>
+
+    <div id="thr_list"></div>
+
+    <input type="text" name="content" id="content"><br>
+    <input type="button" value="送信" onclick="push_button()"><br>
+
+  </div>
+</body>
+
+</html>
